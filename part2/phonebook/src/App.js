@@ -45,10 +45,33 @@ const Persons = ({persons, deletePersonOf}) => {
   )
 }
 
+const Notification = ({message}) => {
+  if (message === null) {
+    return null
+  }
+
+  const notificationStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: 20,
+    borderStyle: 'solid',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10
+  }
+
+  return (
+    <div style={notificationStyle}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [ persons, setPersons ] = useState([]) 
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
+  const [ notificationMessage, setNotificationMessage ] = useState(null)
 
   useEffect(() => {
     console.log('effect')
@@ -79,6 +102,10 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+        setNotificationMessage(`Added ${returnedPerson.name}`)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
       })
   }
 
@@ -106,6 +133,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage} />
       <h3>Add a new</h3>
       <PersonForm
         newName={newName}
