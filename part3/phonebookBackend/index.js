@@ -39,6 +39,12 @@ app.get('/api/persons/:id', (request, response) => {
     }
   })
 
+  app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    persons = persons.filter(person => person.id !== id)
+    response.status(204).end()
+  })
+
 app.get('/info', (request, response) => {
     response.write(`<div>Phonebook has info for ${persons.length} people</div>`)
     response.write(`<div>${new Date().toString()}</div>`)
@@ -47,6 +53,7 @@ app.get('/info', (request, response) => {
 })
 
 const PORT = 3001
-app.listen(PORT, () => {
+// bind ip adress for wsl2
+app.listen(PORT, '0.0.0.0',  () => {
     console.log(`Server running on port ${PORT}`)
 })
