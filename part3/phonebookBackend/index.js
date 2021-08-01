@@ -14,11 +14,12 @@ app.use(morgan('tiny'))
 app.use(express.json())
 
 const errorHandler = (error, request, response, next) => {
-    console.error("aaaa")
     console.error(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
@@ -39,23 +40,16 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
-    const name = request.body.name
-    const number = request.body.number
-    if (!name || !number) {
-        return response.status(400).json({
-            error: 'content missing'
-      })
-    }
-
+app.post('/api/persons', (request, response, next) => {
     const person = new Person({
-      name: name,
-      number: number
+      name: request.body.name,
+      number: request.body.number
     })
 
     person.save().then(savedPerson => {
         response.json(savedPerson)
     })
+    .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
