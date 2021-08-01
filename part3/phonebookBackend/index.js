@@ -1,6 +1,9 @@
+require('dotenv').config()
+
 const cors = require('cors')
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 const app = express()
 
@@ -34,7 +37,9 @@ let persons = [
 ]
 
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then(persons => {
+        response.json(persons)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -91,7 +96,7 @@ app.get('/info', (request, response) => {
 
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 // bind ip adress for wsl2
 app.listen(PORT, '0.0.0.0',  () => {
     console.log(`Server running on port ${PORT}`)
