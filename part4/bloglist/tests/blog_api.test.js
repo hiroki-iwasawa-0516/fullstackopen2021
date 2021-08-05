@@ -40,6 +40,22 @@ test('a valid blog can be added', async () => {
   expect(response.body).toContainEqual({ ...newBlog, __v: expect.any(Number), _id: expect.any(String) })
 })
 
+test('a blog can be deleted', async () => {
+  const blogsAtStart  = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete._id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(
+    helper.initialBlogs.length - 1
+  )
+  expect(blogsAtEnd).not.toContainEqual(blogToDelete)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
