@@ -21,23 +21,16 @@ test('all notes are returned', async () => {
 })
 
 test('a valid blog can be added', async () => {
-  const newBlog = {
-    title: 'Go To Statement Considered Harmful',
-    author: 'Edsger W. Dijkstra',
-    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-    likes: 5,
-  }
-
   await api
     .post('/api/blogs')
-    .send(newBlog)
+    .send(helper.newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const response = await api.get('/api/blogs')
 
   expect(response.body).toHaveLength(helper.initialBlogs.length +1)
-  expect(response.body).toContainEqual({ ...newBlog, __v: expect.any(Number), _id: expect.any(String) })
+  expect(response.body).toContainEqual({ ...helper.newBlog, __v: expect.any(Number), _id: expect.any(String) })
 })
 
 test('a blog can be deleted', async () => {
@@ -54,6 +47,16 @@ test('a blog can be deleted', async () => {
     helper.initialBlogs.length - 1
   )
   expect(blogsAtEnd).not.toContainEqual(blogToDelete)
+})
+
+test('a blog can be updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogsToUpdate = blogsAtStart[0]
+
+  await api.put(`/api/blogs/${blogsToUpdate._id}`).send(helper.newBlog)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd[0]).toEqual({ ...helper.newBlog, __v: expect.any(Number), _id:blogsToUpdate._id })
 })
 
 afterAll(() => {
