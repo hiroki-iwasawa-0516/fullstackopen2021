@@ -29,8 +29,8 @@ test('a valid blog can be added', async () => {
 
   const response = await api.get('/api/blogs')
 
-  expect(response.body).toHaveLength(helper.initialBlogs.length +1)
-  expect(response.body).toContainEqual({ ...helper.newBlog, __v: expect.any(Number), _id: expect.any(String) })
+  expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
+  expect(response.body).toContainEqual({ ...helper.newBlog, id: expect.any(String) })
 })
 
 test('a blog can be deleted', async () => {
@@ -38,7 +38,7 @@ test('a blog can be deleted', async () => {
   const blogToDelete = blogsAtStart[0]
 
   await api
-    .delete(`/api/blogs/${blogToDelete._id}`)
+    .delete(`/api/blogs/${blogToDelete.id}`)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()
@@ -53,10 +53,10 @@ test('a blog can be updated', async () => {
   const blogsAtStart = await helper.blogsInDb()
   const blogsToUpdate = blogsAtStart[0]
 
-  await api.put(`/api/blogs/${blogsToUpdate._id}`).send(helper.newBlog)
+  await api.put(`/api/blogs/${blogsToUpdate.id}`).send(helper.newBlog)
 
   const blogsAtEnd = await helper.blogsInDb()
-  expect(blogsAtEnd[0]).toEqual({ ...helper.newBlog, __v: expect.any(Number), _id:blogsToUpdate._id })
+  expect(blogsAtEnd[0]).toEqual({ ...helper.newBlog, id:blogsToUpdate.id })
 })
 
 afterAll(() => {
