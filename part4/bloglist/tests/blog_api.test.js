@@ -15,8 +15,8 @@ beforeEach(async () => {
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
 
-  const userObjects = helper.initUsers.map(user => new User(user))
-  const userPromises = userObjects.map(user => user.save())
+
+  const userPromises = helper.initUsers.map(user => api.post('/api/users').send(user))
   await Promise.all(userPromises)
 })
 
@@ -27,8 +27,15 @@ test('all notes are returned', async () => {
 })
 
 test('a valid blog can be added', async () => {
+  const loginResponse =
+    await api
+      .post('/api/login')
+      .send({ username: helper.initUsers[0].username, password: helper.initUsers[0].password })
+
+
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${loginResponse.body.token}`)
     .send(helper.newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -41,6 +48,13 @@ test('a valid blog can be added', async () => {
     id: expect.any(String),
     user: { id: expect.any(String), name: expect.any(String), username: expect.any(String) }
   })
+})
+
+test('a blog isn\'t added if Authorization is not set', async () => {
+  await api
+    .post('/api/blogs')
+    .send(helper.newBlog)
+    .expect(401)
 })
 
 test('a blog can be deleted', async () => {
