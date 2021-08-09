@@ -5,13 +5,19 @@ const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
   const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
+
+  const userObjects = helper.initUsers.map(user => new User(user))
+  const userPromises = userObjects.map(user => user.save())
+  await Promise.all(userPromises)
 })
 
 test('all notes are returned', async () => {
@@ -30,7 +36,11 @@ test('a valid blog can be added', async () => {
   const response = await api.get('/api/blogs')
 
   expect(response.body).toHaveLength(helper.initialBlogs.length + 1)
-  expect(response.body).toContainEqual({ ...helper.newBlog, id: expect.any(String) })
+  expect(response.body).toContainEqual({
+    ...helper.newBlog,
+    id: expect.any(String),
+    user: { id: expect.any(String), name: expect.any(String), username: expect.any(String) }
+  })
 })
 
 test('a blog can be deleted', async () => {
