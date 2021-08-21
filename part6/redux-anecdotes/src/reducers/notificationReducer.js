@@ -12,12 +12,18 @@ const reducer = (state = initialState, action) => {
   }
 }
 
-export const setNotification = (content) => {
-  return {
-    type: 'SET',
-    data: {
-      content
-    }
+export const setNotification = (content, second) => {
+  return dispatch => {
+    dispatch({
+      type: 'SET',
+      data: {
+        content
+      }
+    })
+    setTimeout(() => dispatch({
+      type: 'SET',
+      data: {content: ''}
+    }), second * 1000)
   }
 }
 
