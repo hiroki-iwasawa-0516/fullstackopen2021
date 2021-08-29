@@ -18,7 +18,20 @@ const useField = (type) => {
 const useCountry = (name) => {
   const [country, setCountry] = useState(null)
 
-  useEffect(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect( async () =>
+  {
+    if (name === '') {
+      setCountry(null)
+      return
+    }
+    try {
+      const res = await axios.get(`https://restcountries.eu/rest/v2/name/${name}?fullText=true`)
+      setCountry({ data: res.data[0], found: true })
+    } catch {
+      setCountry({ found: false })
+    }
+  }, [name])
 
   return country
 }
